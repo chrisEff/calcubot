@@ -1,0 +1,11 @@
+{
+  "name": "calcubot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Christian Frenzl",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
