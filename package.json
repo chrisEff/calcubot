@@ -1,11 +1,14 @@
 {
-  "name": "calcubot",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "author": "Christian Frenzl",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+	"name": "calcubot",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"author": "Christian Frenzl",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
+	"devDependencies": {
+		"prettier": "^3.4.2"
+	}
 }
