@@ -1,6 +1,8 @@
 import express from 'express'
 import { Server } from 'socket.io'
 
+import evaluateExpression from './evaluateExpression'
+
 const app = express()
 
 const PORT = 3000
@@ -41,19 +43,17 @@ io.on('connection', socket => {
 			return
 		}
 
-		// TODO: improve regex
-		if (message.match(/^-?[0-9]+(([-+/*][0-9]+)?([.,][0-9]+)?)*?$/)) {
-			// TODO: get rid of eval
-			const solvedProblem = message + ' = ' + eval(message)
+		try {
+			const result = evaluateExpression(message)
+			const solvedProblem = `${message} = ${result}`
 			history = [...history.slice(-9), solvedProblem]
 			socket.emit('bot_message', solvedProblem)
-			return
+		} catch (error) {
+			socket.emit(
+				'bot_message',
+				`Sorry, I'm not sure what you meant by "${message}". The only things I understand are mathematical expressions and the command "history".`,
+			)
 		}
-
-		socket.emit(
-			'bot_message',
-			`Sorry, I'm not sure what you meant by "${message}". The only things I understand are mathematical expressions and the command "history".`,
-		)
 	})
 
 	socket.on('disconnect', () => {
