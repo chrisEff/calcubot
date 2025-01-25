@@ -1,4 +1,6 @@
-import { KeyboardEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Button, ConfigProvider, Flex, Form, Input, theme, Typography } from 'antd'
+
 import './App.css'
 import io from 'socket.io-client'
 import type { Message } from './types.ts'
@@ -6,8 +8,9 @@ import type { Message } from './types.ts'
 const socket = io('ws://localhost:3000')
 
 function App() {
+	const { defaultAlgorithm } = theme
 	const [messages, setMessages] = useState<Array<Message>>([])
-	const inputRef = useRef<HTMLInputElement>(null)
+	const [form] = Form.useForm()
 
 	useEffect(() => {
 		socket.on('bot_message', (message: string) => {
@@ -19,44 +22,46 @@ function App() {
 	}, [socket])
 
 	useEffect(() => {
-		inputRef.current?.focus()
+		form.focusField('message')
 	}, [])
 
 	const addMessage = (message: Message) => {
 		setMessages(existingMessages => [...existingMessages, message])
 	}
 
-	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === 'Enter') {
-			handleMessage()
-		}
-	}
+	const submitMessage = () => {
+		const message = form.getFieldValue('message')
+		if (!message) return
 
-	const handleMessage = () => {
-		if (!inputRef.current?.value) return
+		addMessage({ from: 'user', text: message })
+		socket.emit('user_message', message)
 
-		addMessage({ from: 'user', text: inputRef.current.value })
-		socket.emit('user_message', inputRef.current.value)
-
-		inputRef.current.value = ''
-		inputRef.current.focus()
+		form.setFieldValue('message', '')
+		form.focusField('message')
 	}
 
 	return (
-		<>
-			<h1>CalcuBot 🤖</h1>
-			<div className="messages">
+		<ConfigProvider theme={{ algorithm: defaultAlgorithm }}>
+			<Typography.Title level={1}>CalcuBot 🤖</Typography.Title>
+			<Flex className="messages" gap="small" vertical>
 				{messages.map((message, index) => (
 					<div key={index} className={message.from + 'Message'}>
-						{message.text}
+						<Typography.Text>{message.text}</Typography.Text>
 					</div>
 				))}
-			</div>
-			<div className="inputs">
-				<input type="text" ref={inputRef} onKeyDown={handleKeyDown} />
-				<input type="button" value="Send" onClick={handleMessage} />
-			</div>
-		</>
+			</Flex>
+			<br />
+			<Form form={form} onFinish={submitMessage}>
+				<Flex gap="middle">
+					<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
+						<Input type="text" allowClear />
+					</Form.Item>
+					<Button type="primary" htmlType="submit">
+						Send
+					</Button>
+				</Flex>
+			</Form>
+		</ConfigProvider>
 	)
 }
 
