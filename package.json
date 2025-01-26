@@ -8,6 +8,10 @@
 	"workspaces": [
 		"packages/*"
 	],
+	"scripts": {
+		"start:backend": "yarn workspace calcubot-backend dev",
+		"start:frontend": "yarn workspace calcubot-frontend dev"
+	},
 	"devDependencies": {
 		"prettier": "^3.4.2"
 	}
