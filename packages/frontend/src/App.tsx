@@ -5,7 +5,7 @@ import './App.css'
 import io from 'socket.io-client'
 import type { Message } from './types.ts'
 
-const socket = io('ws://localhost:3000')
+const socket = io(process.env.CALCUBOT_WEBSOCKET_URL)
 
 function App() {
 	const { defaultAlgorithm } = theme
