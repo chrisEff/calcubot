@@ -71,11 +71,13 @@ function App() {
 			<Layout style={{ alignItems: 'center' }}>
 				<Content>
 					<Affix offsetTop={10} style={{ alignSelf: 'flex-end' }}>
-						<Flex gap="small" align="center">
-							<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-							<Switch onChange={setDarkMode} />
-							<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-						</Flex>
+						<Tooltip title="Toggle dark mode">
+							<Flex gap="small" align="center">
+								<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+								<Switch onChange={setDarkMode} />
+								<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+							</Flex>
+						</Tooltip>
 					</Affix>
 					<Typography.Title level={1} style={{ alignSelf: 'center' }}>
 						CalcuBot 🤖
