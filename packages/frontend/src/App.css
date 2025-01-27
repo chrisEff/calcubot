@@ -1,35 +1,27 @@
-#root {
+.ant-layout-content {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
-	text-align: center;
+	padding: 0 20px;
 }
 
 .messages {
-	border: 1px solid #f0f0f0;
-	border-radius: 10px;
 	flex-grow: 1;
 	overflow-y: auto;
-	padding: 10px;
 	width: 600px;
+}
+
+.message {
+	font-size: 1em;
+	max-width: 450px;
+	overflow-wrap: break-word;
+	white-space: normal;
 }
 
 .userMessage {
 	align-self: flex-end;
-	background-color: #35a2fd;
-	border-radius: 10px;
-	max-width: 450px;
-	padding: 5px 10px;
-	text-align: right;
-	overflow-wrap: break-word;
 }
 
 .botMessage {
 	align-self: flex-start;
-	background-color: #f0f0f0;
-	border-radius: 5px;
-	max-width: 450px;
-	padding: 5px 10px;
-	text-align: left;
-	overflow-wrap: break-word;
 }

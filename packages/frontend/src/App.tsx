@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Button, ConfigProvider, Flex, Form, Input, theme, Typography } from 'antd'
+import { Affix, Button, Card, ConfigProvider, Flex, Form, Input, Layout, Switch, Tag, theme, Typography } from 'antd'
+import { MoonOutlined, SunOutlined } from '@ant-design/icons'
 
 import './App.css'
 import io from 'socket.io-client'
 import type { Message } from './types.ts'
 
+const { Content } = Layout
+
 const socket = io(process.env.CALCUBOT_WEBSOCKET_URL)
 
 function App() {
-	const { defaultAlgorithm } = theme
+	const { defaultAlgorithm, darkAlgorithm } = theme
+	const [darkMode, setDarkMode] = useState(false)
 	const [messages, setMessages] = useState<Array<Message>>([])
 	const [form] = Form.useForm()
 
@@ -41,26 +45,45 @@ function App() {
 	}
 
 	return (
-		<ConfigProvider theme={{ algorithm: defaultAlgorithm }}>
-			<Typography.Title level={1}>CalcuBot 🤖</Typography.Title>
-			<Flex className="messages" gap="small" vertical>
-				{messages.map((message, index) => (
-					<div key={index} className={message.from + 'Message'}>
-						<Typography.Text>{message.text}</Typography.Text>
-					</div>
-				))}
-			</Flex>
-			<br />
-			<Form form={form} onFinish={submitMessage}>
-				<Flex gap="middle">
-					<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
-						<Input type="text" allowClear />
-					</Form.Item>
-					<Button type="primary" htmlType="submit">
-						Send
-					</Button>
-				</Flex>
-			</Form>
+		<ConfigProvider theme={{ algorithm: darkMode ? darkAlgorithm : defaultAlgorithm }}>
+			<Layout style={{ alignItems: 'center' }}>
+				<Content>
+					<Affix offsetTop={10} style={{ alignSelf: 'flex-end' }}>
+						<Flex gap="small" align="center">
+							<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+							<Switch onChange={setDarkMode} />
+							<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+						</Flex>
+					</Affix>
+					<Typography.Title level={1} style={{ alignSelf: 'center' }}>
+						CalcuBot 🤖
+					</Typography.Title>
+					<Card className="messages">
+						<Flex gap="small" vertical>
+							{messages.map((message, index) => (
+								<Tag
+									key={index}
+									className={'message ' + message.from + 'Message'}
+									color={message.from === 'user' ? 'blue' : ''}
+								>
+									{message.text}
+								</Tag>
+							))}
+						</Flex>
+					</Card>
+					<br />
+					<Form form={form} onFinish={submitMessage}>
+						<Flex gap="middle">
+							<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
+								<Input type="text" allowClear />
+							</Form.Item>
+							<Button type="primary" htmlType="submit">
+								Send
+							</Button>
+						</Flex>
+					</Form>
+				</Content>
+			</Layout>
 		</ConfigProvider>
 	)
 }
