@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Affix, Button, Card, ConfigProvider, Flex, Form, Input, Layout, Switch, Tag, theme, Typography } from 'antd'
 import { MoonOutlined, SunOutlined } from '@ant-design/icons'
 
@@ -11,6 +11,7 @@ const { Content } = Layout
 const socket = io(process.env.CALCUBOT_WEBSOCKET_URL)
 
 function App() {
+	const messagesRef = useRef<HTMLDivElement>(null)
 	const { defaultAlgorithm, darkAlgorithm } = theme
 	const [darkMode, setDarkMode] = useState(false)
 	const [messages, setMessages] = useState<Array<Message>>([])
@@ -29,8 +30,15 @@ function App() {
 		form.focusField('message')
 	}, [])
 
+	const scrollToBottom = () => {
+		if (messagesRef.current) {
+			messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+		}
+	}
+
 	const addMessage = (message: Message) => {
 		setMessages(existingMessages => [...existingMessages, message])
+		setTimeout(scrollToBottom, 10)
 	}
 
 	const submitMessage = () => {
@@ -58,7 +66,7 @@ function App() {
 					<Typography.Title level={1} style={{ alignSelf: 'center' }}>
 						CalcuBot 🤖
 					</Typography.Title>
-					<Card className="messages">
+					<Card className="messages" ref={messagesRef}>
 						<Flex gap="small" vertical>
 							{messages.map((message, index) => (
 								<Tag
