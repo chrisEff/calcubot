@@ -51,6 +51,7 @@ function App() {
 	}
 
 	const addMessage = (message: Message) => {
+		message.timestamp = new Date().toLocaleTimeString()
 		setMessages(existingMessages => [...existingMessages, message])
 		setTimeout(scrollToBottom, 10)
 	}
@@ -90,7 +91,7 @@ function App() {
 									className={'message ' + message.from + 'Message'}
 									color={message.from === 'user' ? 'blue' : ''}
 								>
-									{message.text}
+									<Tooltip title={message.timestamp}>{message.text}</Tooltip>
 								</Tag>
 							))}
 						</Flex>
