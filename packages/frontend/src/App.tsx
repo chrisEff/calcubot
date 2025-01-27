@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { Affix, Button, Card, ConfigProvider, Flex, Form, Input, Layout, Switch, Tag, theme, Typography } from 'antd'
-import { MoonOutlined, SunOutlined } from '@ant-design/icons'
+import {
+	Affix,
+	Button,
+	Card,
+	ConfigProvider,
+	Flex,
+	Form,
+	Input,
+	Layout,
+	Switch,
+	Tag,
+	theme,
+	Tooltip,
+	Typography,
+} from 'antd'
+import { MoonOutlined, SendOutlined, SunOutlined } from '@ant-design/icons'
 
 import './App.css'
 import io from 'socket.io-client'
@@ -85,9 +99,11 @@ function App() {
 							<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
 								<Input type="text" allowClear />
 							</Form.Item>
-							<Button type="primary" htmlType="submit">
-								Send
-							</Button>
+							<Tooltip title="Send">
+								<Button type="primary" htmlType="submit">
+									<SendOutlined />
+								</Button>
+							</Tooltip>
 						</Flex>
 					</Form>
 				</Content>
