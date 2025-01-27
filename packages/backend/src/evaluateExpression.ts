@@ -1,59 +1,65 @@
-type Operator = '+' | '-' | '*' | '/'
-type OperatorFunction = (a: number, b: number) => number
-
-const operators: { [key in Operator]: OperatorFunction } = {
-	'+': (a, b) => a + b,
-	'-': (a, b) => a - b,
-	'*': (a, b) => a * b,
-	'/': (a, b) => a / b,
-}
-
-function evaluateExpression(expression: string): number {
-	const tokens = expression.match(/(\d+(\.\d+)*|\+|\-|\*|\/)/g)
-	if (!tokens) throw new Error('Invalid expression')
-
-	const stack: number[] = []
-	const operatorStack: Operator[] = []
-
-	tokens.forEach(token => {
-		if (/\d/.test(token)) {
-			stack.push(parseFloat(token))
-		} else if (token in operators) {
-			while (
-				operatorStack.length &&
-				precedence(operatorStack[operatorStack.length - 1]) >= precedence(token as Operator)
-			) {
-				const operator = operatorStack.pop()!
-				const operatorFunc: OperatorFunction = operators[operator]
-				const b = stack.pop()!
-				const a = stack.pop()!
-				stack.push(operatorFunc(a, b))
-			}
-			operatorStack.push(token as Operator)
-		}
-	})
-
-	while (operatorStack.length) {
-		const operator = operatorStack.pop()!
-		const b = stack.pop()!
-		const a = stack.pop()!
-		stack.push(operators[operator](a, b))
+const evaluateExpression = (expression: string) => {
+	const regex = {
+		onlyValidCharacters: /^[\d+\-*/.()]+$/,
+		simpleNumber: /^-?\d+(\.\d+)?$/,
+		parentheses: /\(([^()]+)\)/g,
+		multiplication: /(\d+(?:\.\d+)?)\*(\d+(?:\.\d+)?)/g,
+		division: /(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)/g,
+		subtraction: /(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g,
+		addition: /(\d+(?:\.\d+)?)\+(\d+(?:\.\d+)?)/g,
 	}
 
-	return stack[0]
-}
+	// remove whitespaces
+	expression = expression.replace(/\s/g, '')
 
-function precedence(operator: string): number {
-	switch (operator) {
-		case '+':
-		case '-':
-			return 1
-		case '*':
-		case '/':
-			return 2
-		default:
-			return 0
+	if (!regex.onlyValidCharacters.test(expression)) {
+		throw new Error('Invalid expression')
 	}
+
+	if (regex.simpleNumber.test(expression)) {
+		return parseFloat(expression)
+	}
+
+	if (regex.parentheses.test(expression)) {
+		return evaluateExpression(
+			expression.replace(regex.parentheses, (match, innerExpression) => {
+				return evaluateExpression(innerExpression).toString()
+			}),
+		)
+	}
+
+	if (regex.multiplication.test(expression)) {
+		return evaluateExpression(
+			expression.replace(regex.multiplication, (match, a, b) => {
+				return (parseFloat(a) * parseFloat(b)).toString()
+			}),
+		)
+	}
+
+	if (regex.division.test(expression)) {
+		return evaluateExpression(
+			expression.replace(regex.division, (match, a, b) => {
+				return (parseFloat(a) / parseFloat(b)).toString()
+			}),
+		)
+	}
+
+	if (regex.subtraction.test(expression)) {
+		return evaluateExpression(
+			expression.replace(regex.subtraction, (match, a, b) => {
+				return (parseFloat(a) - parseFloat(b)).toString()
+			}),
+		)
+	}
+	if (regex.addition.test(expression)) {
+		return evaluateExpression(
+			expression.replace(regex.addition, (match, a, b) => {
+				return (parseFloat(a) + parseFloat(b)).toString()
+			}),
+		)
+	}
+
+	return expression
 }
 
 export default evaluateExpression

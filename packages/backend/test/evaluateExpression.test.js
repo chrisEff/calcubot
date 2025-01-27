@@ -65,4 +65,11 @@ describe('evaluateExpression', () => {
 	])('should accept decimal values: $expression', ({ expression, expected }) => {
 		expect(evaluateExpression(expression)).toBe(expected)
 	})
+
+	it.each([
+		{ expression: '5*(3+4)', expected: 35 },
+		{ expression: '5+3*(17-2*3)+7*(3+15)/5', expected: 63.2 },
+	])('should handle parenthesis: $expression', ({ expression, expected }) => {
+		expect(evaluateExpression(expression)).toBe(expected)
+	})
 })
