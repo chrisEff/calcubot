@@ -3,10 +3,10 @@ const evaluateExpression = (expression: string) => {
 		onlyValidCharacters: /^[\d+\-*/.()]+$/,
 		simpleNumber: /^-?\d+(\.\d+)?$/,
 		parentheses: /\(([^()]+)\)/g,
-		multiplication: /(\d+(?:\.\d+)?)\*(\d+(?:\.\d+)?)/g,
-		division: /(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)/g,
-		subtraction: /(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g,
-		addition: /(\d+(?:\.\d+)?)\+(\d+(?:\.\d+)?)/g,
+		multiplication: /((?:(?:^|[^\d])-)?\d+(?:\.\d+)?)\*(-?\d+(?:\.\d+)?)/g,
+		division: /((?:(?:^|[^\d])-)?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)/g,
+		subtraction: /((?:(?:^|[^\d])-)?\d+(?:\.\d+)?)-(-?\d+(?:\.\d+)?)/g,
+		addition: /((?:(?:^|[^\d])-)?\d+(?:\.\d+)?)\+(-?\d+(?:\.\d+)?)/g,
 	}
 
 	// remove whitespaces
@@ -55,6 +55,7 @@ const evaluateExpression = (expression: string) => {
 			}),
 		)
 	}
+
 	if (regex.addition.test(expression)) {
 		return evaluateExpression(
 			expression.replace(regex.addition, (match, a, b) => {

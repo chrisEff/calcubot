@@ -79,4 +79,14 @@ describe('evaluateExpression', () => {
 	])('should handle Infinity: $expression', ({ expression, expected }) => {
 		expect(evaluateExpression(expression)).toBe(expected)
 	})
+
+	it.each([
+		{ expression: '-5+2', expected: -3 },
+		{ expression: '-5-2', expected: -7 },
+		{ expression: '-5*2', expected: -10 },
+		{ expression: '-5/2', expected: -2.5 },
+		{ expression: '5*(5-7)', expected: -10 },
+	])('should handle negative values: $expression', ({ expression, expected }) => {
+		expect(evaluateExpression(expression)).toBe(expected)
+	})
 })
