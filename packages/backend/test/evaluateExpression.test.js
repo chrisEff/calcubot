@@ -89,4 +89,13 @@ describe('evaluateExpression', () => {
 	])('should handle negative values: $expression', ({ expression, expected }) => {
 		expect(evaluateExpression(expression)).toBe(expected)
 	})
+
+	it.each([
+		{ expression: '.1+.9', expected: 1 },
+		{ expression: '.1-.1', expected: 0 },
+		{ expression: '.1*5', expected: 0.5 },
+		{ expression: '.4/.2', expected: 2 },
+	])('should handle decimals written without a leading zero: $expression', ({ expression, expected }) => {
+		expect(evaluateExpression(expression)).toBe(expected)
+	})
 })

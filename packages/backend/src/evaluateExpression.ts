@@ -1,5 +1,7 @@
 const evaluateExpression = (expression: string) => {
 	const regex = {
+		whiteSpace: /\s/g,
+		decimalsWithoutLeadingZero: /(^|[^\d])\./g,
 		onlyValidCharacters: /^[\d+\-*/.()]+$/,
 		simpleNumber: /^-?\d+(\.\d+)?$/,
 		parentheses: /\(([^()]+)\)/g,
@@ -10,7 +12,12 @@ const evaluateExpression = (expression: string) => {
 	}
 
 	// remove whitespaces
-	expression = expression.replace(/\s/g, '')
+	expression = expression.replace(regex.whiteSpace, '')
+
+	// sanitize decimal values that are written without a leading zero (e.g. '.9')
+	expression = expression.replace(regex.decimalsWithoutLeadingZero, (match, a) => {
+		return `${a}0.`
+	})
 
 	if (expression === 'Infinity') {
 		return expression
