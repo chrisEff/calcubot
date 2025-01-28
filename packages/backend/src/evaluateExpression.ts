@@ -12,8 +12,12 @@ const evaluateExpression = (expression: string) => {
 	// remove whitespaces
 	expression = expression.replace(/\s/g, '')
 
+	if (expression === 'Infinity') {
+		return expression
+	}
+
 	if (!regex.onlyValidCharacters.test(expression)) {
-		throw new Error('Invalid expression')
+		throw new Error('Invalid expression: ' + expression)
 	}
 
 	if (regex.simpleNumber.test(expression)) {

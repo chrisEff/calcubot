@@ -72,4 +72,11 @@ describe('evaluateExpression', () => {
 	])('should handle parenthesis: $expression', ({ expression, expected }) => {
 		expect(evaluateExpression(expression)).toBe(expected)
 	})
+
+	it.each([
+		// Might not be mathematically 100% correct, but that's how JS calculates.
+		{ expression: '1/0', expected: 'Infinity' },
+	])('should handle Infinity: $expression', ({ expression, expected }) => {
+		expect(evaluateExpression(expression)).toBe(expected)
+	})
 })
