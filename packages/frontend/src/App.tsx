@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import {
 	Affix,
 	Button,
@@ -30,6 +30,7 @@ function App() {
 	const [darkMode, setDarkMode] = useState(false)
 	const [messages, setMessages] = useState<Array<Message>>([])
 	const [form] = Form.useForm()
+	const [inputHistory, setInputHistory] = useState<Array<string> | undefined>(undefined)
 
 	useEffect(() => {
 		socket.on('bot_message', (message: string) => {
@@ -50,6 +51,10 @@ function App() {
 		}
 	}
 
+	useEffect(() => {
+		setInputHistory(messages.filter(m => m.from === 'user').map(m => m.text))
+	}, [messages])
+
 	const addMessage = (message: Message) => {
 		message.timestamp = new Date().toLocaleTimeString()
 		setMessages(existingMessages => [...existingMessages, message])
@@ -65,6 +70,18 @@ function App() {
 
 		form.setFieldValue('message', '')
 		form.focusField('message')
+	}
+
+	const onKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'ArrowUp' && inputHistory !== undefined) {
+			setInputHistory(current => {
+				const msg = current?.pop()
+				if (msg) {
+					form.setFieldValue('message', msg)
+				}
+				return current
+			})
+		}
 	}
 
 	return (
@@ -100,7 +117,7 @@ function App() {
 					<Form form={form} onFinish={submitMessage}>
 						<Flex gap="middle">
 							<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
-								<Input type="text" allowClear />
+								<Input type="text" allowClear onKeyUp={onKeyUp} />
 							</Form.Item>
 							<Tooltip title="Send">
 								<Button type="primary" htmlType="submit">
