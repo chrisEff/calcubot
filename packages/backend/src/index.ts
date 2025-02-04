@@ -43,7 +43,7 @@ const io = new Server(expressServer, {
 })
 
 io.on('connection', socket => {
-	console.log('a user connected')
+	console.log('User connected, socket.id:', socket.id)
 	socket.emit('bot_message', 'Hello, I am CalcuBot! 👋')
 	socket.emit('bot_message', 'I can solve math problems for you.')
 	socket.emit('bot_message', 'Please enter any mathematical expression (e.g. "5 * 3") and I\'ll solve it if I can.')
@@ -69,6 +69,7 @@ io.on('connection', socket => {
 					socket.emit('bot_message', entry.problem)
 				})
 			} catch (error) {
+				console.log('Error while fetching history:', error)
 				socket.emit('bot_message', 'Sorry, something went wrong while fetching the history from my database.')
 			}
 			return
@@ -81,12 +82,14 @@ io.on('connection', socket => {
 			try {
 				mongoClient.db('calcubot').collection('history').insertOne({ problem: solvedProblem, timestamp: new Date() })
 			} catch (error) {
+				console.log('Error while saving history:', error)
 				socket.emit(
 					'bot_message',
 					`Sorry, something went wrong while saving "${solvedProblem}" to my database, so it won't show up in the history.`,
 				)
 			}
 		} catch (error) {
+			console.log('Error while evaluating expression:', error)
 			socket.emit(
 				'bot_message',
 				`Sorry, I'm not sure what you meant by "${message}". The only things I understand are mathematical expressions and the command "history".`,
@@ -95,6 +98,6 @@ io.on('connection', socket => {
 	})
 
 	socket.on('disconnect', () => {
-		console.log('user disconnected')
+		console.log('User disconnected, socket.id:', socket.id)
 	})
 })
