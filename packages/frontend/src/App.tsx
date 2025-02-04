@@ -99,11 +99,12 @@ function App() {
 					{darkMode !== undefined && (
 						<Affix offsetTop={10} style={{ alignSelf: 'flex-end' }}>
 							<Tooltip title="Toggle dark mode">
-								<Flex gap="small" align="center">
-									<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-									<Switch value={darkMode} onChange={setDarkMode} />
-									<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-								</Flex>
+								<Switch
+									value={darkMode}
+									onChange={setDarkMode}
+									checkedChildren={<MoonOutlined />}
+									unCheckedChildren={<SunOutlined style={{ color: '#111111' }} />}
+								/>
 							</Tooltip>
 						</Affix>
 					)}
