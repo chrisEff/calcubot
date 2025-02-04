@@ -27,7 +27,7 @@ const socket = io(process.env.CALCUBOT_WEBSOCKET_URL)
 function App() {
 	const messagesRef = useRef<HTMLDivElement>(null)
 	const { defaultAlgorithm, darkAlgorithm } = theme
-	const [darkMode, setDarkMode] = useState(false)
+	const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
 	const [messages, setMessages] = useState<Array<Message>>([])
 	const [form] = Form.useForm()
 	const [inputHistory, setInputHistory] = useState<Array<string> | undefined>(undefined)
@@ -42,6 +42,7 @@ function App() {
 	}, [socket])
 
 	useEffect(() => {
+		setDarkMode(window.localStorage.getItem('darkMode') === 'true')
 		form.focusField('message')
 	}, [])
 
@@ -55,6 +56,12 @@ function App() {
 		setInputHistory(messages.filter(m => m.from === 'user').map(m => m.text))
 	}, [messages])
 
+	useEffect(() => {
+		if (darkMode !== undefined) {
+			window.localStorage.setItem('darkMode', JSON.stringify(darkMode))
+		}
+	}, [darkMode])
+
 	const addMessage = (message: Message) => {
 		message.timestamp = new Date().toLocaleTimeString()
 		setMessages(existingMessages => [...existingMessages, message])
@@ -66,6 +73,7 @@ function App() {
 		if (!message) return
 
 		addMessage({ from: 'user', text: message })
+
 		socket.emit('user_message', message)
 
 		form.setFieldValue('message', '')
@@ -88,15 +96,17 @@ function App() {
 		<ConfigProvider theme={{ algorithm: darkMode ? darkAlgorithm : defaultAlgorithm }}>
 			<Layout style={{ alignItems: 'center' }}>
 				<Content>
-					<Affix offsetTop={10} style={{ alignSelf: 'flex-end' }}>
-						<Tooltip title="Toggle dark mode">
-							<Flex gap="small" align="center">
-								<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-								<Switch onChange={setDarkMode} />
-								<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-							</Flex>
-						</Tooltip>
-					</Affix>
+					{darkMode !== undefined && (
+						<Affix offsetTop={10} style={{ alignSelf: 'flex-end' }}>
+							<Tooltip title="Toggle dark mode">
+								<Flex gap="small" align="center">
+									<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+									<Switch value={darkMode} onChange={setDarkMode} />
+									<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
+								</Flex>
+							</Tooltip>
+						</Affix>
+					)}
 					<Typography.Title level={1} style={{ alignSelf: 'center' }}>
 						CalcuBot 🤖
 					</Typography.Title>
