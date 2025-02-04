@@ -66,7 +66,14 @@ function App() {
 		if (!message) return
 
 		addMessage({ from: 'user', text: message })
-		socket.emit('user_message', message)
+
+		if (message === 'darkmode') {
+			setDarkMode(true)
+		} else if (message === 'lightmode') {
+			setDarkMode(false)
+		} else {
+			socket.emit('user_message', message)
+		}
 
 		form.setFieldValue('message', '')
 		form.focusField('message')
@@ -92,7 +99,7 @@ function App() {
 						<Tooltip title="Toggle dark mode">
 							<Flex gap="small" align="center">
 								<SunOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
-								<Switch onChange={setDarkMode} />
+								<Switch value={darkMode} onChange={setDarkMode} />
 								<MoonOutlined style={{ color: darkMode ? '#ffffff' : '#111111' }} />
 							</Flex>
 						</Tooltip>
