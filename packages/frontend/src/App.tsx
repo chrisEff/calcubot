@@ -9,26 +9,26 @@ import {
 	Input,
 	Layout,
 	Switch,
-	Tag,
 	theme,
 	Tooltip,
 	Typography,
 } from 'antd'
 import { MoonOutlined, SendOutlined, SunOutlined } from '@ant-design/icons'
+import io from 'socket.io-client'
 
 import './App.css'
-import io from 'socket.io-client'
-import type { Message } from './types.ts'
+import type { Message as MessageType } from './types.ts'
+import Message from './components/Message.tsx'
 
 const { Content } = Layout
 
 const socket = io(process.env.CALCUBOT_WEBSOCKET_URL)
 
-function App() {
+const App = () => {
 	const messagesRef = useRef<HTMLDivElement>(null)
 	const { defaultAlgorithm, darkAlgorithm } = theme
 	const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
-	const [messages, setMessages] = useState<Array<Message>>([])
+	const [messages, setMessages] = useState<Array<MessageType>>([])
 	const [form] = Form.useForm()
 	const [inputHistory, setInputHistory] = useState<Array<string> | undefined>(undefined)
 
@@ -62,7 +62,7 @@ function App() {
 		}
 	}, [darkMode])
 
-	const addMessage = (message: Message) => {
+	const addMessage = (message: MessageType) => {
 		message.timestamp = new Date().toLocaleTimeString()
 		setMessages(existingMessages => [...existingMessages, message])
 		setTimeout(scrollToBottom, 10)
@@ -114,13 +114,7 @@ function App() {
 					<Card className="messages" ref={messagesRef}>
 						<Flex gap="small" vertical>
 							{messages.map((message, index) => (
-								<Tag
-									key={index}
-									className={'message ' + message.from + 'Message'}
-									color={message.from === 'user' ? 'blue' : ''}
-								>
-									<Tooltip title={message.timestamp}>{message.text}</Tooltip>
-								</Tag>
+								<Message message={message} key={index} />
 							))}
 						</Flex>
 					</Card>
