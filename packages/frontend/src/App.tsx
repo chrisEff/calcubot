@@ -1,23 +1,11 @@
-import { KeyboardEvent, useEffect, useRef, useState } from 'react'
-import {
-	Affix,
-	Button,
-	Card,
-	ConfigProvider,
-	Flex,
-	Form,
-	Input,
-	Layout,
-	Switch,
-	theme,
-	Tooltip,
-	Typography,
-} from 'antd'
-import { MoonOutlined, SendOutlined, SunOutlined } from '@ant-design/icons'
+import { useEffect, useRef, useState } from 'react'
+import { Affix, Card, ConfigProvider, Flex, Layout, Switch, theme, Tooltip, Typography } from 'antd'
+import { MoonOutlined, SunOutlined } from '@ant-design/icons'
 import io from 'socket.io-client'
 
 import './App.css'
 import type { Message as MessageType } from './types.ts'
+import ChatForm from './components/ChatForm.tsx'
 import Message from './components/Message.tsx'
 
 const { Content } = Layout
@@ -29,8 +17,6 @@ const App = () => {
 	const { defaultAlgorithm, darkAlgorithm } = theme
 	const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined)
 	const [messages, setMessages] = useState<Array<MessageType>>([])
-	const [form] = Form.useForm()
-	const [inputHistory, setInputHistory] = useState<Array<string> | undefined>(undefined)
 
 	useEffect(() => {
 		socket.on('bot_message', (message: string) => {
@@ -43,7 +29,6 @@ const App = () => {
 
 	useEffect(() => {
 		setDarkMode(window.localStorage.getItem('darkMode') === 'true')
-		form.focusField('message')
 	}, [])
 
 	const scrollToBottom = () => {
@@ -51,10 +36,6 @@ const App = () => {
 			messagesRef.current.scrollTop = messagesRef.current.scrollHeight
 		}
 	}
-
-	useEffect(() => {
-		setInputHistory(messages.filter(m => m.from === 'user').map(m => m.text))
-	}, [messages])
 
 	useEffect(() => {
 		if (darkMode !== undefined) {
@@ -68,28 +49,12 @@ const App = () => {
 		setTimeout(scrollToBottom, 10)
 	}
 
-	const submitMessage = () => {
-		const message = form.getFieldValue('message')
+	const submitMessage = ({ message }: { message: string }) => {
 		if (!message) return
 
 		addMessage({ from: 'user', text: message })
 
 		socket.emit('user_message', message)
-
-		form.setFieldValue('message', '')
-		form.focusField('message')
-	}
-
-	const onKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'ArrowUp' && inputHistory !== undefined) {
-			setInputHistory(current => {
-				const msg = current?.pop()
-				if (msg) {
-					form.setFieldValue('message', msg)
-				}
-				return current
-			})
-		}
 	}
 
 	return (
@@ -119,18 +84,7 @@ const App = () => {
 						</Flex>
 					</Card>
 					<br />
-					<Form form={form} onFinish={submitMessage}>
-						<Flex gap="middle">
-							<Form.Item className="messageInput" name="message" style={{ flexGrow: 1 }}>
-								<Input type="text" allowClear onKeyUp={onKeyUp} />
-							</Form.Item>
-							<Tooltip title="Send">
-								<Button type="primary" htmlType="submit">
-									<SendOutlined />
-								</Button>
-							</Tooltip>
-						</Flex>
-					</Form>
+					<ChatForm onSubmit={submitMessage} messages={messages} />
 				</Content>
 			</Layout>
 		</ConfigProvider>
